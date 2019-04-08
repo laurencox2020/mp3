@@ -1,0 +1,28 @@
+---
+title: "mp3"
+author: "Lauren Cox"
+date: "4/3/2019"
+output: html_document
+---
+
+```{r 1st chunk}
+library(tidyverse)
+library(macleish)
+library(sf)
+```
+
+```{r 2nd chunk}
+my_points <- tribble(
+  ~point, ~lat, ~lon,
+  "A", 42.450976, -72.678154,
+  "B", 42.458570, -72.674732)
+```
+
+
+```{r 3rd chunk}
+base_plot <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = my_points,
+             popup = ~point)
+base_plot
+```
