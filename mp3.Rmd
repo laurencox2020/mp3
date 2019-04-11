@@ -9,20 +9,32 @@ output: html_document
 library(tidyverse)
 library(macleish)
 library(sf)
+library(leaflet)
 ```
 
 ```{r 2nd chunk}
 my_points <- tribble(
   ~point, ~lat, ~lon,
-  "A", 42.450976, -72.678154,
-  "B", 42.458570, -72.674732)
+  "Group Campsite", 42.450976, -72.678154,
+  "Remote Campsite", 42.458549, -72.679581,
+  "Parking", 42.448013, -72.680663)
 ```
 
-
 ```{r 3rd chunk}
+require(leaflet)
 base_plot <- leaflet() %>%
   addTiles() %>%
   addMarkers(lng = ~lon, lat = ~lat, data = my_points,
              popup = ~point)
+base_plot
+```
+
+  addMarkers(data = macleish_layers[["landmarks"]], 
+             popup = ~ Label, group = "Structures") %>%
+  addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
+  addPolylines(data = macleish_layers[["trails"]], weight = 1, color = "brown") %>%
+  addPolylines(data = macleish_layers[["streams"]], weight = 2) 
+
+
 base_plot
 ```
