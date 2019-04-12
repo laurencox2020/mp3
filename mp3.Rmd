@@ -36,11 +36,13 @@ campsite_points_sf <- campsite_points %>%
 
 ```{r 4th chunk}
 require(leaflet)
-base_plot <- leaflet() %>%
+points_plot <- leaflet() %>%
   addTiles() %>%
   addMarkers(lng = ~lon, lat = ~lat, data = campsite_points,
+             popup = ~point) %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = given_points,
              popup = ~point)
-base_plot
+points_plot
 ```
 
 ```{r 5th chunk}
@@ -77,8 +79,12 @@ research_buffer <- macleish_layers %>%
   st_buffer(dist = 40)
 ```
 
-```{r}
-leaflet() %>%
+```{r 9th chunk}
+base_plot <- leaflet() %>%
   addTiles() %>%
-  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2)
+  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = campsite_points,
+             popup = ~point) 
+  
+base_plot
 ```
