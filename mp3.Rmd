@@ -13,25 +13,41 @@ library(leaflet)
 ```
 
 ```{r 2nd chunk}
-my_points <- tribble(
+given_points <- tribble(
   ~point, ~lat, ~lon,
   "Group Campsite", 42.450976, -72.678154,
   "Remote Campsite", 42.458549, -72.679581,
   "Parking", 42.448013, -72.680663)
+
+campsite_points <- tribble(
+   ~point, ~lat, ~lon,
+  "New1", 42.449195, -72.673576,
+  "New2", 42.454055, -72.676977)
+
 ```
 
 ```{r 3rd chunk}
+given_points_sf <- given_points %>%
+  st_as_sf(coords = c("lat", "lon"))
+
+campsite_points_sf <- campsite_points %>%
+  st_as_sf(coords = c("lat", "lon"))
+```
+
+```{r 4th chunk}
 require(leaflet)
 base_plot <- leaflet() %>%
   addTiles() %>%
-  addMarkers(lng = ~lon, lat = ~lat, data = my_points,
+  addMarkers(lng = ~lon, lat = ~lat, data = campsite_points,
              popup = ~point)
 base_plot
 ```
 
-```{r 4th chunk}
+```{r 5th chunk}
 base_plot <- leaflet() %>%
   addTiles() %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = campsite_points,
+             popup = ~point) %>%
   addMarkers(data = macleish_layers[["landmarks"]], 
              popup = ~ Label, group = "Structures") %>%
   addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
@@ -42,20 +58,21 @@ base_plot <- leaflet() %>%
 base_plot
 ```
 
-```{r 4th chunk}
+```{r 6th chunk}
 proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
 ```
 
-```{r 5th chunk}
+```{r 7th chunk}
 stream_buffer <- macleish_layers %>%
   pluck("streams") %>%
   st_transform(proj4_aea) %>%
-  st_buffer(dist = 10) %>%
+  st_buffer(dist = 60) %>%
   st_transform(4326)
+```
 
-leaflet() %>%
-  addTiles() %>%
-  addPolylines(data = pluck(macleish_layers, "streams"), 
-               weight = 1, color = "black") %>%
-  addPolygons(data = stream_buffer) 
+```{r 8th chunk}
+research_buffer <- macleish_layers %>%
+  pluck("research") %>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = 40)
 ```
