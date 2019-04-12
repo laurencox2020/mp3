@@ -29,6 +29,9 @@ base_plot <- leaflet() %>%
 base_plot
 ```
 
+```{r 4th chunk}
+base_plot <- leaflet() %>%
+  addTiles() %>%
   addMarkers(data = macleish_layers[["landmarks"]], 
              popup = ~ Label, group = "Structures") %>%
   addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
@@ -37,4 +40,22 @@ base_plot
 
 
 base_plot
+```
+
+```{r 4th chunk}
+proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+```
+
+```{r 5th chunk}
+stream_buffer <- macleish_layers %>%
+  pluck("streams") %>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = 10) %>%
+  st_transform(4326)
+
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = pluck(macleish_layers, "streams"), 
+               weight = 1, color = "black") %>%
+  addPolygons(data = stream_buffer) 
 ```
