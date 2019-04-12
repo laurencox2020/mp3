@@ -76,3 +76,9 @@ research_buffer <- macleish_layers %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 40)
 ```
+
+```{r}
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2)
+```
