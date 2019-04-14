@@ -7,7 +7,7 @@ output:
     code_folding: hide
 ---
 
-```{r 1st chunk}
+```{r 1st chunk, message = FALSE}
 library(tidyverse)
 library(macleish)
 library(sf)
