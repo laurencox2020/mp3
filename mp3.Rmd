@@ -76,14 +76,22 @@ stream_buffer <- macleish_layers %>%
 research_buffer <- macleish_layers %>%
   pluck("research") %>%
   st_transform(proj4_aea) %>%
-  st_buffer(dist = 40) %>% 
+  st_buffer(dist = 152.4) %>% 
+  st_transform(4326)
+```
+
+```{r 9th chunk}
+challenge_buffer <- macleish_layers %>%
+  pluck("challenge course") %>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = 152.4) %>% 
   st_transform(4326)
 ```
 
 ```{r 9th chunk}
 base_plot <- leaflet() %>%
   addTiles() %>%
-  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) %>%
+  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 0.8) %>%
   addMarkers(lng = ~lon, lat = ~lat, data = campsite_points,
              popup = ~point) 
   
