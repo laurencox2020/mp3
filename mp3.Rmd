@@ -2,7 +2,9 @@
 title: "mp3"
 author: "Lauren Cox"
 date: "4/3/2019"
-output: html_document
+output:
+  html_document:
+    code_folding: hide
 ---
 
 ```{r 1st chunk}
@@ -32,7 +34,7 @@ proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y
 ```
 
 ```{r 3rd chunk}
-original_campsite_sf <- original_campsite_ponts %>%
+original_campsite_sf <- original_campsite_points %>%
   st_as_sf(coords = c("lat", "lon"))
 
 new_campsite_sf <- new_campsite_points %>%
@@ -44,32 +46,6 @@ parking_sf <- parking_points %>%
 ```
 
 ```{r 4th chunk}
-require(leaflet)
-points_plot <- leaflet() %>%
-  addTiles() %>%
-  addMarkers(lng = ~lon, lat = ~lat, data = new_campsite_points,
-             popup = ~point) %>%
-  addMarkers(lng = ~lon, lat = ~lat, data = original_campsite_points,
-             popup = ~point)
-points_plot
-```
-
-```{r 5th chunk}
-base_plot <- leaflet() %>%
-  addTiles() %>%
-  addMarkers(lng = ~lon, lat = ~lat, data = new_campsite_points,
-             popup = ~point) %>%
-  addMarkers(data = macleish_layers[["landmarks"]], 
-             popup = ~ Label, group = "Structures") %>%
-  addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
-  addPolylines(data = macleish_layers[["trails"]], weight = 1, color = "brown") %>%
-  addPolylines(data = macleish_layers[["streams"]], weight = 2) 
-
-
-base_plot
-```
-
-```{r 6th chunk}
 stream_buffer <- macleish_layers %>%
   pluck("streams") %>%
   st_transform(proj4_aea) %>%
@@ -77,7 +53,7 @@ stream_buffer <- macleish_layers %>%
   st_transform(4326)
 ```
 
-```{r 7th chunk}
+```{r 5th chunk}
 research_buffer <- macleish_layers %>%
  pluck("research") %>%
  st_transform(proj4_aea) %>%
@@ -85,14 +61,14 @@ research_buffer <- macleish_layers %>%
  st_transform(4326)
 ```
 
-```{r 8th chunk}
+```{r 6th chunk}
 parking_buffer <- parking_sf %>%
  st_transform(proj4_aea) %>%
  st_buffer(dist = 804.672) %>%
  st_transform(4326)
 ```
 
-```{r 9th chunk}
+```{r 7th chunk}
 challenge_buffer <- macleish_layers %>%
   pluck("challenge_courses") %>%
   st_transform(proj4_aea) %>%
@@ -100,16 +76,23 @@ challenge_buffer <- macleish_layers %>%
   st_transform(4326)
 ```
 
-```{r 10th chunk}
+
+```{r 8th chunk}
+require(leaflet)
 base_plot <- leaflet() %>%
   addTiles() %>%
-  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = original_campsite_points,
+             popup = "Current Campsite") %>%
   addMarkers(lng = ~lon, lat = ~lat, data = new_campsite_points,
-             popup = ~point) 
+             popup = "New Campsite") %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = parking_points,
+             popup = "Parking Lot") %>%
+  addMarkers(data = macleish_layers[["landmarks"]], 
+             popup = ~ Label, group = "Structures") %>%
+  addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
+  addPolylines(data = macleish_layers[["trails"]], weight = 1, color = "brown") %>%
+  addPolylines(data = macleish_layers[["streams"]], weight = 2) %>%
+  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) 
   
 base_plot
 ```
-
-
-
-
