@@ -1,6 +1,6 @@
 ---
 title: "mp3"
-author: "Lauren Cox"
+author: "Lauren Cox, Emilia Field, and Dee Graham"
 date: "4/3/2019"
 output:
   html_document:
@@ -22,7 +22,7 @@ original_campsite_points <- tribble(
 
 new_campsite_points <- tribble(
    ~point, ~lat, ~lon,
-  "New1", 42.449622, -72.673812,
+  "New1", 42.449559, -72.672803,
   "New2", 42.454087, -72.678297)
 
 parking_points <- tribble(
@@ -73,26 +73,86 @@ challenge_buffer <- macleish_layers %>%
   pluck("challenge_courses") %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 152.4) %>%
-  st_transform(4326)
+  st_transform(4326) %>%
+  st_geometry(research_buffer) %>%
+  st_geometry(challenge_buffer)
 ```
 
-
 ```{r 8th chunk}
-require(leaflet)
-base_plot <- leaflet() %>%
+buffer_map <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = new_campsite_points,
+             popup = "New Campsite") %>%
+  addPolygons(data = stream_buffer, weight = 1, color = "blue") %>%
+  addPolygons(data = research_buffer, weight = 1, color = "black") %>%
+  addPolygons(data = challenge_buffer, weight = 1, color = "red") 
+  
+
+buffer_map
+```
+
+```{r 9th chunk}
+forests <- macleish_layers %>%
+  pluck("forests") %>%
+  rename(forest_type = Sheet1__Na) %>%
+  mutate(computed_area = st_area(geometry))
+
+forests_total <- forests %>%
+  filter(!is.na(forest_type)) %>%
+  group_by(forest_type) %>%
+  summarize(N = n(), total_area = sum(computed_area)) %>%
+  arrange(desc(total_area))
+```
+
+```{r 10th chunk}
+new_campsite_map <- macleish_map %>%
+  addTiles() %>%
+  addMarkers(data = new_campsite_sf,
+             popup = "New Campsite")
+
+new_campsite_map
+```
+
+```{r 11th chuk}
+macleish_map <- leaflet() %>%
   addTiles() %>%
   addMarkers(lng = ~lon, lat = ~lat, data = original_campsite_points,
              popup = "Current Campsite") %>%
+  
   addMarkers(lng = ~lon, lat = ~lat, data = new_campsite_points,
              popup = "New Campsite") %>%
+  
   addMarkers(lng = ~lon, lat = ~lat, data = parking_points,
              popup = "Parking Lot") %>%
+  
   addMarkers(data = macleish_layers[["landmarks"]], 
              popup = ~ Label, group = "Structures") %>%
-  addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
-  addPolylines(data = macleish_layers[["trails"]], weight = 1, color = "brown") %>%
-  addPolylines(data = macleish_layers[["streams"]], weight = 2) %>%
-  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) 
   
-base_plot
+  addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
+  
+  addPolylines(data = macleish_layers[["trails"]], weight = 1, color = "brown") %>%
+  
+  addPolylines(data = macleish_layers[["streams"]], weight = 2) %>%
+  
+  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) %>%
+  
+  addPolygons(data = macleish_layers[["wetlands"]], 
+              weight = 1, group = "Natural") 
+  
+macleish_map
 ```
+
+```{r 12th chunk}
+forest_col <- colorFactor("Greens", forests_total$forest_type)
+
+vegetation_map <- leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = forests_total, 
+              color = ~forest_col(forest_type), weight = 0, 
+              fillOpacity = 0.6,
+              popup = ~forest_type, group = "Natural")
+
+vegetation_map
+```
+
+^[This is my repository (https://github.com/laurencox2020/mp3.git)
