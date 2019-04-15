@@ -5,6 +5,7 @@ date: "4/15/2019"
 output:
   html_document:
     code_folding: hide
+  pdf_document: default
 ---
 
 ```{r 1st chunk, message = FALSE}
@@ -15,34 +16,43 @@ library(leaflet)
 ```
 
 ```{r 2nd chunk}
+# original campsite points given in the project directions
+
 original_campsite_points <- tribble(
   ~point, ~lat, ~lon,
   "Group Campsite", 42.450976, -72.678154,
   "Remote Campsite", 42.458549, -72.679581)
+
+# our new campsite coordinate points
 
 new_campsite_points <- tribble(
    ~point, ~lat, ~lon,
   "New1", 42.449559, -72.672803,
   "New2", 42.454087, -72.678297)
 
+# parking lot, given in the project directions
+
 parking_points <- tribble(
   ~point, ~lat, ~lon,
   "Parking", 42.448013, -72.680663)
 
-proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+# used to describe the crs
 
+proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
 ```
 
 ```{r 3rd chunk}
+# converts above points to sf objects
+
 original_campsite_sf <- original_campsite_points %>%
-  st_as_sf(coords = c("lat", "lon"))
+  st_as_sf(coords = c("lon", "lat"))
 
 new_campsite_sf <- new_campsite_points %>%
-  st_as_sf(coords = c("lat", "lon"))
+  st_as_sf(coords = c("lon", "lat"))
 
 parking_sf <- parking_points %>%
-  st_as_sf(coords = c("lat", "lon")) %>%
-  st_set_crs(proj4_aea)
+  st_as_sf(coords = c("lon", "lat")) %>%
+  st_set_crs(4326)
 ```
 
 ```{r 4th chunk}
@@ -50,6 +60,7 @@ stream_buffer <- macleish_layers %>%
   pluck("streams") %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 60.96 ) %>%
+  # st_buffer calculates the distance from feet to meters
   st_transform(4326)
 ```
 
@@ -73,30 +84,32 @@ challenge_buffer <- macleish_layers %>%
   pluck("challenge_courses") %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 152.4) %>%
-  st_transform(4326) %>%
-  st_geometry(research_buffer) %>%
-  st_geometry(challenge_buffer)
+  st_transform(4326) 
 ```
 
 ```{r 8th chunk}
+# buffer map
 buffer_map <- leaflet() %>%
   addTiles() %>%
-  addMarkers(lng = ~lon, lat = ~lat, data = new_campsite_points,
-             popup = "New Campsite") %>%
+  addMarkers(data = new_campsite_sf,
+             popup = "New Campsites") %>%
   addPolygons(data = stream_buffer, weight = 1, color = "blue") %>%
   addPolygons(data = research_buffer, weight = 1, color = "black") %>%
-  addPolygons(data = challenge_buffer, weight = 1, color = "red") 
+  addPolygons(data = challenge_buffer, weight = 1, color = "red")  %>%
+  addPolygons(data = parking_buffer, weight = 1, color = "green")
   
 
 buffer_map
 ```
 
 ```{r 9th chunk, message = FALSE}
+# renames variable in data set 
 forests <- macleish_layers %>%
   pluck("forests") %>%
   rename(forest_type = Sheet1__Na) %>%
   mutate(computed_area = st_area(geometry))
 
+# below function computes the total area of each forest type
 forests_total <- forests %>%
   filter(!is.na(forest_type)) %>%
   group_by(forest_type) %>%
@@ -105,15 +118,10 @@ forests_total <- forests %>%
 ```
 
 ```{r 10th chunk, message = FALSE}
+# contour map 
+
 macleish_map <- leaflet() %>%
   addTiles() %>%
-  
-  addMarkers(lng = ~lon, lat = ~lat, data = new_campsite_points,
-             popup = "New Campsite") %>%
-  
-  addMarkers(lng = ~lon, lat = ~lat, data = parking_points,
-             popup = "Parking Lot") %>%
-  
   addMarkers(data = macleish_layers[["landmarks"]], 
              popup = ~ Label, group = "Structures") %>%
   
@@ -132,10 +140,15 @@ macleish_map
 ```
 
 ```{r 11th chunk, message = FALSE, warning = FALSE}
+# vegetation map with new and original campsites to prove that they do not share the same forest 
+
 forest_col <- colorFactor("Greens", forests_total$forest_type)
 
 vegetation_map <- leaflet() %>%
-  addTiles() %>%
+  addTiles() %>%addMarkers(data = new_campsite_sf,
+             popup = "New Campsites") %>%
+  addMarkers(data = original_campsite_sf,
+             popup = "Original Campsites") %>%
   addPolygons(data = forests_total, 
               color = ~forest_col(forest_type), weight = 0, 
               fillOpacity = 0.6,
