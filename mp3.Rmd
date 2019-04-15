@@ -88,6 +88,7 @@ challenge_buffer <- macleish_layers %>%
 ```
 
 ```{r 8th chunk}
+<<<<<<< HEAD
 # buffer map
 buffer_map <- leaflet() %>%
   addTiles() %>%
@@ -100,6 +101,21 @@ buffer_map <- leaflet() %>%
   
 
 buffer_map
+=======
+research_buffer <- macleish_layers %>%
+  pluck("research") %>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = 152.4) %>% 
+  st_transform(4326)
+```
+
+```{r 9th chunk}
+challenge_buffer <- macleish_layers %>%
+  pluck("challenge course") %>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = 152.4) %>% 
+  st_transform(4326)
+>>>>>>> 6a3bfe992a28410898871922e4ed1c70bc4fcaed
 ```
 
 ```{r 9th chunk, message = FALSE}
@@ -122,8 +138,14 @@ forests_total <- forests %>%
 
 macleish_map <- leaflet() %>%
   addTiles() %>%
+<<<<<<< HEAD
   addMarkers(data = macleish_layers[["landmarks"]], 
              popup = ~ Label, group = "Structures") %>%
+=======
+  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 0.8) %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = campsite_points,
+             popup = ~point) 
+>>>>>>> 6a3bfe992a28410898871922e4ed1c70bc4fcaed
   
   addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
   
