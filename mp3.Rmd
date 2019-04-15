@@ -1,7 +1,7 @@
 ---
-title: "mp3"
+title: "Mini Project 3"
 author: "Lauren Cox, Emilia Field, and Dee Graham"
-date: "4/3/2019"
+date: "4/15/2019"
 output:
   html_document:
     code_folding: hide
@@ -91,7 +91,7 @@ buffer_map <- leaflet() %>%
 buffer_map
 ```
 
-```{r 9th chunk}
+```{r 9th chunk, message = FALSE}
 forests <- macleish_layers %>%
   pluck("forests") %>%
   rename(forest_type = Sheet1__Na) %>%
@@ -104,20 +104,9 @@ forests_total <- forests %>%
   arrange(desc(total_area))
 ```
 
-```{r 10th chunk}
-new_campsite_map <- macleish_map %>%
-  addTiles() %>%
-  addMarkers(data = new_campsite_sf,
-             popup = "New Campsite")
-
-new_campsite_map
-```
-
-```{r 11th chuk}
+```{r 10th chunk, message = FALSE}
 macleish_map <- leaflet() %>%
   addTiles() %>%
-  addMarkers(lng = ~lon, lat = ~lat, data = original_campsite_points,
-             popup = "Current Campsite") %>%
   
   addMarkers(lng = ~lon, lat = ~lat, data = new_campsite_points,
              popup = "New Campsite") %>%
@@ -134,15 +123,12 @@ macleish_map <- leaflet() %>%
   
   addPolylines(data = macleish_layers[["streams"]], weight = 2) %>%
   
-  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) %>%
-  
-  addPolygons(data = macleish_layers[["wetlands"]], 
-              weight = 1, group = "Natural") 
+  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) 
   
 macleish_map
 ```
 
-```{r 12th chunk}
+```{r 11th chunk, message = FALSE, warning = FALSE}
 forest_col <- colorFactor("Greens", forests_total$forest_type)
 
 vegetation_map <- leaflet() %>%
