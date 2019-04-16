@@ -17,50 +17,49 @@ library(leaflet)
 
 ```{r 2nd chunk}
 # original campsite points given in the project directions
-
 original_campsite_points <- tribble(
   ~point, ~lat, ~lon,
   "Group Campsite", 42.450976, -72.678154,
   "Remote Campsite", 42.458549, -72.679581)
 
 # our new campsite coordinate points
-
 new_campsite_points <- tribble(
    ~point, ~lat, ~lon,
   "New1", 42.449559, -72.672803,
   "New2", 42.454087, -72.678297)
 
-# parking lot, given in the project directions
-
+# parking lot points, given in the project directions
 parking_points <- tribble(
   ~point, ~lat, ~lon,
   "Parking", 42.448013, -72.680663)
 
-# used to describe the crs
-
+# used to describe the crs, projection for buffers
 proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
 ```
 
 ```{r 3rd chunk}
 # converts above points to sf objects
-
 original_campsite_sf <- original_campsite_points %>%
   st_as_sf(coords = c("lon", "lat"))
 
 new_campsite_sf <- new_campsite_points %>%
   st_as_sf(coords = c("lon", "lat"))
 
+#converts parking lot points to sf object and defines projection
 parking_sf <- parking_points %>%
   st_as_sf(coords = c("lon", "lat")) %>%
   st_set_crs(4326)
 ```
 
 ```{r 4th chunk}
+# buffer to convert feet to meters 
+# creates a buffer zone, in the shape of a polygon, around the stream lines
+
 stream_buffer <- macleish_layers %>%
   pluck("streams") %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 60.96 ) %>%
-  # st_buffer calculates the distance from feet to meters
+  # converts 200' to 60.96 m
   st_transform(4326)
 ```
 
@@ -69,6 +68,7 @@ research_buffer <- macleish_layers %>%
  pluck("research") %>%
  st_transform(proj4_aea) %>%
  st_buffer(dist = 152.4) %>%
+  # converts 500' to 152.4 m
  st_transform(4326)
 ```
 
@@ -76,6 +76,7 @@ research_buffer <- macleish_layers %>%
 parking_buffer <- parking_sf %>%
  st_transform(proj4_aea) %>%
  st_buffer(dist = 804.672) %>%
+  # converts 1/2 mile to 804.672m
  st_transform(4326)
 ```
 
@@ -84,6 +85,7 @@ challenge_buffer <- macleish_layers %>%
   pluck("challenge_courses") %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 152.4) %>%
+  # same distance as research buffer
   st_transform(4326) 
 ```
 
@@ -93,6 +95,8 @@ forests <- macleish_layers %>%
   pluck("forests") %>%
   rename(forest_type = Sheet1__Na) %>%
   mutate(computed_area = st_area(geometry))
+# st_area returns the area of polygon geometries
+
 
 # below function computes the total area of each forest type
 forests_total <- forests %>%
@@ -102,13 +106,16 @@ forests_total <- forests %>%
   arrange(desc(total_area))
 ```
 
+**Map 1: Buffer Map: Parking, Research, and Challenge Course**
 ```{r 9th chunk}
-# parking, research, and challenge course buffers map
+# interactive map
 buffer_map <- leaflet() %>%
   addTiles() %>%
+  # adding in our proposed campsite points
   addMarkers(data = new_campsite_sf,
              popup = "New Campsites") %>%
-  addPolygons(data = research_buffer, weight = 1, color = "black") %>%
+  # adding in research, challenege course, and parking buffers
+  addPolygons(data = research_buffer, weight = 1, color = "purple") %>%
   addPolygons(data = challenge_buffer, weight = 1, color = "red")  %>%
   addPolygons(data = parking_buffer, weight = 1, color = "green")
   
@@ -116,24 +123,30 @@ buffer_map <- leaflet() %>%
 buffer_map
 ```
 
-```{r 10th chunk, message = FALSE}
-# contour map with streams buffer and wetlands plotted
 
+**Map 2: Contour Map with Stream Buffer and Wetlands**
+```{r 10th chunk, message = FALSE}
 contour_map <- leaflet() %>%
   addTiles() %>%
+# adding in our proposed campsite points
   addMarkers(data = new_campsite_sf,
              popup = "New Campsites") %>%
+# stream buffer and wetlands
   addPolygons(data = stream_buffer, weight = 1, color = "purple") %>%
   addPolygons(data = macleish_layers[["wetlands"]], 
-              weight = 1, group = "Natural", color = "red", opacity = 1) %>%
+              weight = 1, group = "Natural", color = "red", opacity = 1, popup = "Wetlands") %>%
+# macleish contours
   addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 0.5) 
   
 contour_map
 ```
 
+
+**Map 3: Vegetation**
 ```{r 11th chunk, message = FALSE, warning = FALSE}
 # vegetation map with new and original campsites to prove that they do not share the same forest 
 
+# sets the color of the forests by type
 forest_col <- colorFactor("Greens", forests_total$forest_type)
 
 vegetation_map <- leaflet() %>%
@@ -141,6 +154,7 @@ vegetation_map <- leaflet() %>%
              popup = "New Campsites") %>%
   addMarkers(data = original_campsite_sf,
              popup = "Original Campsites") %>%
+# forest type found by popup
   addPolygons(data = forests_total, 
               color = ~forest_col(forest_type), weight = 0, 
               fillOpacity = 0.6,
@@ -150,3 +164,5 @@ vegetation_map
 ```
 
 ^[This is my repository (https://github.com/laurencox2020/mp3.git)
+
+Word count: `r wordcountaddin::word_count()`
