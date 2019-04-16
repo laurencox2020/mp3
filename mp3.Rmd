@@ -88,37 +88,6 @@ challenge_buffer <- macleish_layers %>%
 ```
 
 ```{r 8th chunk}
-<<<<<<< HEAD
-# buffer map
-buffer_map <- leaflet() %>%
-  addTiles() %>%
-  addMarkers(data = new_campsite_sf,
-             popup = "New Campsites") %>%
-  addPolygons(data = stream_buffer, weight = 1, color = "blue") %>%
-  addPolygons(data = research_buffer, weight = 1, color = "black") %>%
-  addPolygons(data = challenge_buffer, weight = 1, color = "red")  %>%
-  addPolygons(data = parking_buffer, weight = 1, color = "green")
-  
-
-buffer_map
-=======
-research_buffer <- macleish_layers %>%
-  pluck("research") %>%
-  st_transform(proj4_aea) %>%
-  st_buffer(dist = 152.4) %>% 
-  st_transform(4326)
-```
-
-```{r 9th chunk}
-challenge_buffer <- macleish_layers %>%
-  pluck("challenge course") %>%
-  st_transform(proj4_aea) %>%
-  st_buffer(dist = 152.4) %>% 
-  st_transform(4326)
->>>>>>> 6a3bfe992a28410898871922e4ed1c70bc4fcaed
-```
-
-```{r 9th chunk, message = FALSE}
 # renames variable in data set 
 forests <- macleish_layers %>%
   pluck("forests") %>%
@@ -133,32 +102,33 @@ forests_total <- forests %>%
   arrange(desc(total_area))
 ```
 
-```{r 10th chunk, message = FALSE}
-# contour map 
-
-macleish_map <- leaflet() %>%
+```{r 9th chunk}
+# parking, research, and challenge course buffers map
+buffer_map <- leaflet() %>%
   addTiles() %>%
-<<<<<<< HEAD
-  addMarkers(data = macleish_layers[["landmarks"]], 
-             popup = ~ Label, group = "Structures") %>%
-=======
-  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 0.8) %>%
-  addMarkers(lng = ~lon, lat = ~lat, data = campsite_points,
-             popup = ~point) 
->>>>>>> 6a3bfe992a28410898871922e4ed1c70bc4fcaed
+  addMarkers(data = new_campsite_sf,
+             popup = "New Campsites") %>%
+  addPolygons(data = research_buffer, weight = 1, color = "black") %>%
+  addPolygons(data = challenge_buffer, weight = 1, color = "red")  %>%
+  addPolygons(data = parking_buffer, weight = 1, color = "green")
   
-  addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
-  
-  addPolylines(data = macleish_layers[["trails"]], weight = 1, color = "brown") %>%
-  
+
+buffer_map
+```
+
+```{r 10th chunk, message = FALSE}
+# contour map with streams buffer and wetlands plotted
+
+contour_map <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(data = new_campsite_sf,
+             popup = "New Campsites") %>%
+  addPolygons(data = stream_buffer, weight = 1, color = "purple") %>%
   addPolygons(data = macleish_layers[["wetlands"]], 
-              weight = 1, group = "Natural") %>%
+              weight = 1, group = "Natural", color = "red", opacity = 1) %>%
+  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 0.5) 
   
-  addPolylines(data = macleish_layers[["streams"]], weight = 2) %>%
-  
-  addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 2) 
-  
-macleish_map
+contour_map
 ```
 
 ```{r 11th chunk, message = FALSE, warning = FALSE}
