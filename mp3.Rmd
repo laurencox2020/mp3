@@ -88,7 +88,6 @@ challenge_buffer <- macleish_layers %>%
 ```
 
 ```{r 8th chunk}
-<<<<<<< HEAD
 # buffer map
 buffer_map <- leaflet() %>%
   addTiles() %>%
@@ -101,7 +100,6 @@ buffer_map <- leaflet() %>%
   
 
 buffer_map
-=======
 research_buffer <- macleish_layers %>%
   pluck("research") %>%
   st_transform(proj4_aea) %>%
@@ -111,11 +109,10 @@ research_buffer <- macleish_layers %>%
 
 ```{r 9th chunk}
 challenge_buffer <- macleish_layers %>%
-  pluck("challenge course") %>%
+  pluck("challenge_courses") %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 152.4) %>% 
   st_transform(4326)
->>>>>>> 6a3bfe992a28410898871922e4ed1c70bc4fcaed
 ```
 
 ```{r 9th chunk, message = FALSE}
@@ -138,14 +135,11 @@ forests_total <- forests %>%
 
 macleish_map <- leaflet() %>%
   addTiles() %>%
-<<<<<<< HEAD
   addMarkers(data = macleish_layers[["landmarks"]], 
              popup = ~ Label, group = "Structures") %>%
-=======
   addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 0.8) %>%
   addMarkers(lng = ~lon, lat = ~lat, data = campsite_points,
-             popup = ~point) 
->>>>>>> 6a3bfe992a28410898871922e4ed1c70bc4fcaed
+             popup = ~point)
   
   addPolygons(data = macleish_layers[["buildings"]], weight = 1, popup = ~name, color = "black") %>%
   
@@ -177,6 +171,21 @@ vegetation_map <- leaflet() %>%
               popup = ~forest_type, group = "Natural")
 
 vegetation_map
+```
+
+
+```{r}
+buffer_map <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(data = new_campsite_sf,
+             popup = "New Campsites") %>%
+  addPolygons(data = stream_buffer, weight = 1, color = "purple") %>%
+   addPolygons(data = macleish_layers[["wetlands"]], 
+              weight = 1, group = "Natural", color = "red", opacity = 1) %>%
+   addPolylines(data = pluck(macleish_layers, "contours_3m"), weight = 0.8)
+  
+
+buffer_map
 ```
 
 ^[This is my repository (https://github.com/laurencox2020/mp3.git)
