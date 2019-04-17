@@ -1,7 +1,7 @@
 ---
 title: "Mini Project 3"
 author: "Lauren Cox, Emilia Field, and Dee Graham"
-date: "4/15/2019"
+date: "4/16/2019"
 output:
   html_document:
     code_folding: hide
@@ -10,7 +10,9 @@ output:
 
 **Finding New Ground at MacLeish**
 
-For Mini Project 3, our objective was to find potential areas to build a new campsite for MacLeish by meeting the specific requirements given. The campsite had to be a half a mile walk from the parking area, within 200’ of a stream or other source of water, in a forest that is unlike the forest in the two other campsites, relatively flat, and at least 500’ from any research area or any element of the Challenge Course. In order to graphically display all of these, we used the buffer function on streams, research, parking, and challenge course data. 
+For Mini Project 3, we are trying to identify potential areas to build a new campsite for MacLeish by meeting the specific requirements. The campsite must be a half a mile walk from the parking area, within 200’ of a stream or other source of water, in a forest that is unlike the forest in the two other campsites, relatively flat, and at least 500’ from any research area or any element of the Challenge Course. 
+
+MacLeish is a 260-acre patchwork of forest and farmland owned by Smith College. Macleish fields are located in Whately, Massachusetts and sit next to state land.
 
 ```{r 1st chunk, message = FALSE}
 library(tidyverse)
@@ -126,7 +128,7 @@ buffer_map <- leaflet() %>%
 
 buffer_map
 ```
-
+The buffer map shows the buffers of the research area (purple), the challenge course (red), and the parking buffer (green). We plotted data from our research, challenge course, and parking buffer functions. This map proves that our proposed campsites are outside of the research and challenge course areas and within the parking buffer that shows a half mile radius. 
 
 **Map 2: Contour Map with Stream Buffer and Wetlands**
 ```{r 10th chunk, message = FALSE}
@@ -144,7 +146,7 @@ contour_map <- leaflet() %>%
   
 contour_map
 ```
-
+The contour map shows the stream buffers, wetland areas, and contours at Macleish. Our campsite points are not located within the stream buffers to avoid flood zones. Our points positioned on the contours show that the areas are relatively flat. The goal for this map is to ensure that these new campsites could be a long term investment and offer a sense of security from the possible danger areas of water and to prove the flatness of the locations at Macleish. 
 
 **Map 3: Vegetation**
 ```{r 11th chunk, message = FALSE, warning = FALSE}
@@ -166,6 +168,24 @@ vegetation_map <- leaflet() %>%
 
 vegetation_map
 ```
+The vegetation map shows both the existing campsites and our proposed campsites. The viewer can click on the different areas and see exactly which type of vegetation is in each area. We used different shades of green to distinguish differences in forest types. This map proves the requirement that the new campsite locations do not share the same forest as the existing campsites.
+
+**Recommendations and Resources:**
+
+We recommend that Smith include new trails to make our proposed campsites more accessible. Campers will have to carry their equipment since there is no parking lot at the campsites. As a camper is going to have gear, materials, and other camping necessities, a trail from the parking lot to either of our locations will allow campers to walk to our sites. 
+
+With the idea of safety, we would recommend that Smith add warning signals to the nearby areas to warn the patrons of any bears or other wildlife that may be entering the vicinity. This could include bells or other noisemakers around the new campsites. This alarms the campsite patrons to either take shelter or attentive measures. We are not expecting this to be a very expensive investment, around $20-$30 per campsite.
+
+For the basic necessities required to design our campsites, the costs may vary. To hire workers to build a fire pit, food area, and supplies, this would be about $192 (2 students working 8 hours for one day at $12/hour.)
+
+Paul Wetzel estimates that Macleish would pay $500 for a table, $6000 for a shelter, $300 per tent platform based on previous costs for campsites.
+
+To design our campsites, this could take about a month depending on the weather and the season.
+
+Some concerns about environmental impact are human waste and cooking waste, such as grey water. Smith could install a sump to pour grey water that drains into the ground. Other environmental concerns are erosion, displacing of animals or plants, and necessary preservable cultural or historical locations.
+
+One roadblock is that our campsites are not easily accessible by walking, especially while carrying equipment. This is why we suggested building trails from the parking lot to the sites. Another roadblock is that people might go onto state property next to the sites. Other than that, campites are low use and impact and very feasible to build!
+
 
 ^[This is my repository (https://github.com/laurencox2020/mp3.git)
 
