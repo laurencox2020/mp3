@@ -5,7 +5,6 @@ date: "4/16/2019"
 output:
   html_document:
     code_folding: hide
-  pdf_document: default
 ---
 
 For Mini Project 3, we are trying to identify potential areas to build a new campsite for MacLeish by meeting the specific requirements. The campsite must be a half a mile walk from the parking area, within 200’ of a stream or other source of water, in a forest that is unlike the forest in the two other campsites, relatively flat, and at least 500’ from any research area or any element of the Challenge Course. 
